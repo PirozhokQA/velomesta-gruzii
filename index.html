@@ -1422,9 +1422,6 @@
       renderGallery(place);
       photoModal.hidden = false;
       document.body.style.overflow = "hidden";
-      if (location.hash !== `#${place.id}`) {
-        history.replaceState(null, "", `#${place.id}`);
-      }
     }
 
     function closePhotoPopup() {
@@ -1581,16 +1578,8 @@
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && !photoModal.hidden) closePhotoPopup();
     });
-    window.addEventListener("hashchange", () => {
-      const id = location.hash.slice(1);
-      if (id) focusPlace(id, false);
-    });
-
     addMarkers();
     renderList();
-    if (location.hash) {
-      focusPlace(location.hash.slice(1), false);
-    }
   </script>
 </body>
 </html>
