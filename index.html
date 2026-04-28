@@ -112,11 +112,20 @@
       box-shadow: 0 0 0 3px rgba(20, 115, 93, .12);
     }
 
+    .filter-label {
+      display: block;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
     .filters {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 8px;
-      margin-top: 12px;
+      margin-top: 8px;
     }
 
     .chip {
@@ -126,12 +135,18 @@
       color: var(--ink);
       background: #fff;
       cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
     }
 
     .chip.active {
       color: #fff;
       border-color: var(--green);
       background: var(--green);
+    }
+
+    .type-filters {
+      grid-template-columns: repeat(2, 1fr);
     }
 
     .stats {
@@ -163,6 +178,16 @@
     .list {
       overflow: auto;
       padding: 14px;
+    }
+
+    .empty-state {
+      padding: 18px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      color: var(--muted);
+      background: #fbfdfc;
+      font-size: 14px;
+      line-height: 1.4;
     }
 
     .place {
@@ -441,6 +466,46 @@
       font-size: 12px;
     }
 
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .action-link,
+    .ghost-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .action-link {
+      border: 1px solid var(--green);
+      color: #fff;
+      background: var(--green);
+    }
+
+    .ghost-action {
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .copy-status {
+      min-height: 18px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
     .close-photo {
       position: absolute;
       top: 10px;
@@ -543,11 +608,21 @@
           </svg>
           <input id="search" type="search" placeholder="Найти место или тип катания">
         </div>
+        <span class="filter-label">Сложность</span>
         <div class="filters" aria-label="Фильтр сложности">
           <button class="chip active" data-filter="all">Все</button>
           <button class="chip" data-filter="easy">Легко</button>
           <button class="chip" data-filter="medium">Средне</button>
           <button class="chip" data-filter="hard">Сложно</button>
+        </div>
+        <span class="filter-label">Тип катания</span>
+        <div class="filters type-filters" aria-label="Фильтр типа катания">
+          <button class="chip active" data-type-filter="all">Все типы</button>
+          <button class="chip" data-type-filter="city">Город и море</button>
+          <button class="chip" data-type-filter="road">Шоссе</button>
+          <button class="chip" data-type-filter="gravel">Гравий</button>
+          <button class="chip" data-type-filter="mountain">Горы и MTB</button>
+          <button class="chip" data-type-filter="bikepacking">Bikepacking</button>
         </div>
       </section>
       <section class="stats" aria-label="Сводка">
@@ -585,6 +660,11 @@
           <div><strong id="photoDistance"></strong><span>длина</span></div>
           <div><strong id="photoSeason"></strong><span>лучший сезон</span></div>
         </div>
+        <div class="modal-actions">
+          <a class="action-link" id="mapsLink" href="#" target="_blank" rel="noopener">Открыть в Google Maps</a>
+          <button class="ghost-action" id="copyCoords" type="button">Скопировать координаты</button>
+        </div>
+        <span class="copy-status" id="copyStatus" aria-live="polite"></span>
         <a class="photo-credit" id="photoCredit" href="#" target="_blank" rel="noopener">Фото: Wikimedia Commons</a>
       </div>
     </article>
@@ -625,6 +705,7 @@
         region: "Аджария",
         coords: [41.6500, 41.6360],
         difficulty: "easy",
+        category: "city",
         type: "город / море",
         distance: "12-14 км",
         season: "круглый год",
@@ -639,6 +720,7 @@
         region: "Тбилиси",
         coords: [41.7427, 44.7394],
         difficulty: "medium",
+        category: "gravel",
         type: "гравий / город",
         distance: "10-29 км",
         season: "март-ноябрь",
@@ -653,6 +735,7 @@
         region: "Тбилиси",
         coords: [41.7016, 44.7537],
         difficulty: "medium",
+        category: "mountain",
         type: "подъёмы / парк",
         distance: "14-50 км",
         season: "март-ноябрь",
@@ -667,6 +750,7 @@
         region: "Тбилиси",
         coords: [41.7731, 44.8615],
         difficulty: "medium",
+        category: "road",
         type: "шоссе / вода",
         distance: "20-45 км",
         season: "апрель-октябрь",
@@ -681,6 +765,7 @@
         region: "Мцхета-Мтианети",
         coords: [41.8425, 44.7206],
         difficulty: "medium",
+        category: "road",
         type: "шоссе / история",
         distance: "35-60 км",
         season: "март-ноябрь",
@@ -695,6 +780,7 @@
         region: "Кахетия",
         coords: [41.9177, 45.4731],
         difficulty: "medium",
+        category: "road",
         type: "шоссе / виноградники",
         distance: "30-80 км",
         season: "апрель-июнь, сентябрь-октябрь",
@@ -709,6 +795,7 @@
         region: "Самцхе-Джавахети",
         coords: [41.8380, 43.3790],
         difficulty: "medium",
+        category: "gravel",
         type: "лес / гравий",
         distance: "15-55 км",
         season: "май-октябрь",
@@ -723,6 +810,7 @@
         region: "Самцхе-Джавахети",
         coords: [41.7509, 43.5294],
         difficulty: "hard",
+        category: "mountain",
         type: "MTB / высота",
         distance: "10-40 км",
         season: "июнь-сентябрь",
@@ -737,6 +825,7 @@
         region: "Казбеги",
         coords: [42.6629, 44.6200],
         difficulty: "hard",
+        category: "mountain",
         type: "горы / подъём",
         distance: "8-35 км",
         season: "июнь-сентябрь",
@@ -751,6 +840,7 @@
         region: "Мцхета-Мтианети",
         coords: [42.4776, 44.4762],
         difficulty: "hard",
+        category: "road",
         type: "шоссе / перевал",
         distance: "20-70 км",
         season: "июнь-сентябрь",
@@ -765,6 +855,7 @@
         region: "Сванетия",
         coords: [43.0452, 42.7297],
         difficulty: "hard",
+        category: "bikepacking",
         type: "bikepacking / горы",
         distance: "86 км",
         season: "июль-сентябрь",
@@ -779,6 +870,7 @@
         region: "Самегрело",
         coords: [42.4552, 42.3772],
         difficulty: "medium",
+        category: "gravel",
         type: "гравий / каньоны",
         distance: "20-65 км",
         season: "апрель-октябрь",
@@ -793,6 +885,14 @@
       easy: "Легко",
       medium: "Средне",
       hard: "Сложно"
+    };
+
+    const categoryLabel = {
+      city: "Город и море",
+      road: "Шоссе",
+      gravel: "Гравий",
+      mountain: "Горы и MTB",
+      bikepacking: "Bikepacking"
     };
 
     const map = L.map("map", {
@@ -819,8 +919,13 @@
     const photoDistance = document.getElementById("photoDistance");
     const photoSeason = document.getElementById("photoSeason");
     const photoCredit = document.getElementById("photoCredit");
+    const mapsLink = document.getElementById("mapsLink");
+    const copyCoords = document.getElementById("copyCoords");
+    const copyStatus = document.getElementById("copyStatus");
     const closePhoto = document.getElementById("closePhoto");
     let activeFilter = "all";
+    let activeTypeFilter = "all";
+    let selectedPlace = null;
 
     function safeImage(event) {
       event.target.src = fallbackImage;
@@ -839,26 +944,64 @@
       img.src = src;
     }
 
+    function mapsUrl(place) {
+      return `https://www.google.com/maps/search/?api=1&query=${place.coords[0]},${place.coords[1]}`;
+    }
+
     function openPhotoPopup(place) {
+      selectedPlace = place;
       photoTitle.textContent = place.title;
       photoTags.innerHTML = `
         <span class="tag ${place.difficulty}">${difficultyLabel[place.difficulty]}</span>
         <span class="tag">${place.type}</span>
+        <span class="tag">${categoryLabel[place.category]}</span>
         <span class="tag">${place.region}</span>
       `;
       photoNote.textContent = place.note;
       photoDistance.textContent = place.distance;
       photoSeason.textContent = place.season;
       photoCredit.href = place.photoPage;
+      mapsLink.href = mapsUrl(place);
+      copyStatus.textContent = "";
       setPhoto(modalPhoto, place.photo, place.title);
       photoModal.hidden = false;
       document.body.style.overflow = "hidden";
+      if (location.hash !== `#${place.id}`) {
+        history.replaceState(null, "", `#${place.id}`);
+      }
     }
 
     function closePhotoPopup() {
       photoModal.hidden = true;
       modalPhoto.removeAttribute("src");
+      copyStatus.textContent = "";
       document.body.style.overflow = "";
+    }
+
+    async function copySelectedCoords() {
+      if (!selectedPlace) return;
+      const text = `${selectedPlace.coords[0]}, ${selectedPlace.coords[1]}`;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (error) {
+        const input = document.createElement("input");
+        input.value = text;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand("copy");
+        input.remove();
+      }
+      copyStatus.textContent = "Координаты скопированы";
+    }
+
+    function focusPlace(id, zoom = true) {
+      const place = places.find((item) => item.id === id);
+      if (!place) return;
+      setActive(place.id, true);
+      if (zoom) {
+        map.flyTo(place.coords, place.difficulty === "hard" ? 10 : 11, { duration: .75 });
+      }
+      openPhotoPopup(place);
     }
 
     function markerIcon(place) {
@@ -874,11 +1017,7 @@
     function addMarkers() {
       places.forEach((place) => {
         const marker = L.marker(place.coords, { icon: markerIcon(place), title: place.title });
-        marker.on("click", () => {
-          setActive(place.id, true);
-          map.flyTo(place.coords, place.difficulty === "hard" ? 10 : 11, { duration: .75 });
-          openPhotoPopup(place);
-        });
+        marker.on("click", () => focusPlace(place.id));
         marker.addTo(map);
         markers.set(place.id, marker);
       });
@@ -889,6 +1028,7 @@
       button.className = "place";
       button.dataset.id = place.id;
       button.dataset.difficulty = place.difficulty;
+      button.dataset.category = place.category;
       button.innerHTML = `
         <img src="${place.photo}" alt="" referrerpolicy="no-referrer">
         <span>
@@ -902,10 +1042,7 @@
       `;
       button.querySelector("img").addEventListener("error", safeImage);
       button.addEventListener("click", () => {
-        setActive(place.id, true);
-        const marker = markers.get(place.id);
-        map.flyTo(place.coords, place.difficulty === "hard" ? 10 : 11, { duration: .75 });
-        openPhotoPopup(place);
+        focusPlace(place.id);
       });
       return button;
     }
@@ -913,13 +1050,21 @@
     function renderList() {
       const term = search.value.trim().toLowerCase();
       const visible = places.filter((place) => {
-        const haystack = `${place.title} ${place.region} ${place.type} ${place.note}`.toLowerCase();
+        const haystack = `${place.title} ${place.region} ${place.type} ${categoryLabel[place.category]} ${place.note}`.toLowerCase();
         const matchesSearch = !term || haystack.includes(term);
         const matchesFilter = activeFilter === "all" || place.difficulty === activeFilter;
-        return matchesSearch && matchesFilter;
+        const matchesType = activeTypeFilter === "all" || place.category === activeTypeFilter;
+        return matchesSearch && matchesFilter && matchesType;
       });
 
-      list.replaceChildren(...visible.map(placeButton));
+      if (visible.length) {
+        list.replaceChildren(...visible.map(placeButton));
+      } else {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        empty.textContent = "По этому фильтру мест пока нет. Попробуйте другой тип катания или сложность.";
+        list.replaceChildren(empty);
+      }
       count.textContent = visible.length;
 
       places.forEach((place) => {
@@ -947,16 +1092,26 @@
       });
     }
 
-    document.querySelectorAll(".chip").forEach((chip) => {
+    document.querySelectorAll("[data-filter]").forEach((chip) => {
       chip.addEventListener("click", () => {
-        document.querySelectorAll(".chip").forEach((item) => item.classList.remove("active"));
+        document.querySelectorAll("[data-filter]").forEach((item) => item.classList.remove("active"));
         chip.classList.add("active");
         activeFilter = chip.dataset.filter;
         renderList();
       });
     });
 
+    document.querySelectorAll("[data-type-filter]").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll("[data-type-filter]").forEach((item) => item.classList.remove("active"));
+        chip.classList.add("active");
+        activeTypeFilter = chip.dataset.typeFilter;
+        renderList();
+      });
+    });
+
     search.addEventListener("input", renderList);
+    copyCoords.addEventListener("click", copySelectedCoords);
     closePhoto.addEventListener("click", closePhotoPopup);
     photoModal.addEventListener("click", (event) => {
       if (event.target === photoModal) closePhotoPopup();
@@ -964,9 +1119,16 @@
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && !photoModal.hidden) closePhotoPopup();
     });
+    window.addEventListener("hashchange", () => {
+      const id = location.hash.slice(1);
+      if (id) focusPlace(id, false);
+    });
 
     addMarkers();
     renderList();
+    if (location.hash) {
+      focusPlace(location.hash.slice(1), false);
+    }
   </script>
 </body>
 </html>
