@@ -307,6 +307,41 @@
       line-height: 1.4;
     }
 
+    .map-modes {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      width: min(520px, calc(100% - 36px));
+      padding: 8px;
+      border: 1px solid rgba(255, 255, 255, .65);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .93);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      z-index: 710;
+    }
+
+    .map-mode {
+      min-height: 34px;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .map-mode.active {
+      color: #fff;
+      border-color: var(--green);
+      background: var(--green);
+    }
+
     .marker-pin {
       position: relative;
       width: 74px;
@@ -569,6 +604,17 @@
         width: calc(100% - 24px);
       }
 
+      .map-modes {
+        top: 12px;
+        left: 12px;
+        width: calc(100% - 24px);
+        padding: 7px;
+      }
+
+      .map-mode {
+        flex: 1 1 94px;
+      }
+
       .photo-modal {
         padding: 12px;
       }
@@ -642,6 +688,12 @@
 
     <section class="map-shell">
       <div id="map" role="application" aria-label="Карта веломест в Грузии"></div>
+      <div class="map-modes" aria-label="Режим отображения карты">
+        <button class="map-mode active" type="button" data-map-mode="terrain">Рельеф</button>
+        <button class="map-mode" type="button" data-map-mode="osm">Леса и дороги</button>
+        <button class="map-mode" type="button" data-map-mode="satellite">Спутник</button>
+        <button class="map-mode" type="button" data-map-mode="light">Светлая</button>
+      </div>
       <div class="map-overlay">
         <h3>Выберите отметку</h3>
         <p>Клик по точке покажет фото, длину маршрута, уровень сложности и лучший сценарий поездки.</p>
@@ -983,10 +1035,36 @@
 
     L.control.zoom({ position: "bottomright" }).addTo(map);
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-      maxZoom: 18,
-      attribution: "&copy; OpenStreetMap &copy; CARTO"
-    }).addTo(map);
+    const mapLayers = {
+      terrain: L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
+        maxZoom: 17,
+        attribution: "&copy; OpenStreetMap &copy; OpenTopoMap"
+      }),
+      osm: L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap"
+      }),
+      satellite: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+        maxZoom: 19,
+        attribution: "Tiles &copy; Esri"
+      }),
+      light: L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap &copy; CARTO"
+      })
+    };
+
+    let activeMapLayer = mapLayers.terrain.addTo(map);
+
+    function setMapMode(mode) {
+      const nextLayer = mapLayers[mode];
+      if (!nextLayer || nextLayer === activeMapLayer) return;
+      map.removeLayer(activeMapLayer);
+      activeMapLayer = nextLayer.addTo(map);
+      document.querySelectorAll("[data-map-mode]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.mapMode === mode);
+      });
+    }
 
     const markers = new Map();
     const list = document.getElementById("placeList");
@@ -1235,6 +1313,10 @@
         activeTypeFilter = chip.dataset.typeFilter;
         renderList();
       });
+    });
+
+    document.querySelectorAll("[data-map-mode]").forEach((button) => {
+      button.addEventListener("click", () => setMapMode(button.dataset.mapMode));
     });
 
     search.addEventListener("input", renderList);
