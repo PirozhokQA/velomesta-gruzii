@@ -309,62 +309,22 @@
 
     .marker-pin {
       position: relative;
-      isolation: isolate;
-      width: 56px;
-      height: 56px;
+      width: 74px;
+      height: 52px;
       border: 3px solid #fff;
-      border-radius: 50%;
+      border-radius: 999px;
       background: #fff;
-      box-shadow: 0 10px 24px rgba(0, 0, 0, .28);
-    }
-
-    .marker-pin::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      bottom: -8px;
-      width: 16px;
-      height: 16px;
-      border-right: 3px solid #fff;
-      border-bottom: 3px solid #fff;
-      background: currentColor;
-      transform: translateX(-50%) rotate(45deg);
-      z-index: 0;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, .24);
+      overflow: hidden;
     }
 
     .marker-pin img {
-      position: relative;
-      z-index: 1;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border-radius: 50%;
+      border-radius: 999px;
       background: linear-gradient(135deg, #d9eee7, #e8d7bc);
       color: transparent;
-    }
-
-    .marker-pin span {
-      position: absolute;
-      right: -2px;
-      bottom: -2px;
-      width: 18px;
-      height: 18px;
-      border: 2px solid #fff;
-      border-radius: 50%;
-      background: currentColor;
-      z-index: 2;
-    }
-
-    .marker-pin.easy {
-      color: var(--green);
-    }
-
-    .marker-pin.medium {
-      color: var(--amber);
-    }
-
-    .marker-pin.hard {
-      color: var(--red);
     }
 
     .photo-credit {
@@ -407,6 +367,11 @@
       box-shadow: var(--shadow);
     }
 
+    .photo-column {
+      min-width: 0;
+      background: #0f1f1c;
+    }
+
     .photo-view {
       min-height: 460px;
       background: linear-gradient(135deg, #d9eee7, #e8d7bc);
@@ -419,6 +384,39 @@
       object-fit: cover;
       color: transparent;
       display: block;
+    }
+
+    .photo-gallery {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 112px;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 12px;
+      background: #0f1f1c;
+    }
+
+    .gallery-thumb {
+      width: 112px;
+      height: 74px;
+      padding: 0;
+      border: 2px solid rgba(255, 255, 255, .22);
+      border-radius: 8px;
+      background: transparent;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .gallery-thumb.active {
+      border-color: #fff;
+    }
+
+    .gallery-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      color: transparent;
     }
 
     .photo-info {
@@ -585,6 +583,15 @@
         min-height: 320px;
       }
 
+      .photo-gallery {
+        grid-auto-columns: 96px;
+      }
+
+      .gallery-thumb {
+        width: 96px;
+        height: 64px;
+      }
+
       .photo-info {
         padding: 16px;
       }
@@ -649,8 +656,11 @@
           <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
         </svg>
       </button>
-      <div class="photo-view">
-        <img id="modalPhoto" src="" alt="">
+      <div class="photo-column">
+        <div class="photo-view">
+          <img id="modalPhoto" src="" alt="">
+        </div>
+        <div class="photo-gallery" id="photoGallery" aria-label="Фотографии локации"></div>
       </div>
       <div class="photo-info">
         <h3 id="photoTitle"></h3>
@@ -895,6 +905,77 @@
       bikepacking: "Bikepacking"
     };
 
+    const galleryFiles = {
+      batumi: [
+        "Batumi boulevard.jpg",
+        "Batumi Blvd, Georgia.jpg",
+        "Batumi, Georgia (43).jpg",
+        "Batumi, Georgia (1).jpg"
+      ],
+      lisi: [
+        "Lisi Lake in Tbilisi, Georgia.jpg",
+        "Lisi Lake in Tbilisi.jpg",
+        "Tbilisi Lisi lake.jpg",
+        "Lisi Lake, Tbilisi, Georgia 02.jpg"
+      ],
+      turtle: [
+        "Turtle Lake, Tbilisi - 2024-01-17.jpg",
+        "Turtle Lake in Tbilisi, Georgia.jpg",
+        "2025-03-29 Turtle Lake, Tbilisi.jpg",
+        "Tbilisi turtle lake.jpg"
+      ],
+      "tbilisi-sea": [
+        "Tbilisi sea.jpg",
+        "Tbilisi, Georgia — Tbilisi Reservoir.jpg",
+        "Lisi Lake.jpg"
+      ],
+      mtskheta: [
+        "Mtskheta, Svetitskhoveli Cathedral, Georgia.jpg",
+        "Mtskheta, Svetitskhoveli, Georgia.jpg",
+        "Mtskheta, Svetitskhoveli Tower, Georgia.jpg",
+        "Mtskheta, Svetitskhoveli.jpg"
+      ],
+      kakheti: [
+        "Kakheti, Georgia — Georgian vineyards.jpg",
+        "Kakheti, Georgia — Vines.jpg",
+        "Grape Kakheti, Georgia.jpg"
+      ],
+      borjomi: [
+        "Borjomi forests.jpg",
+        "Borjomi.jpg",
+        "Borjomi National Park (4).JPG"
+      ],
+      bakuriani: [
+        "Bakuriani, Georgia2.JPG",
+        "20081127 Bakuriani.jpg",
+        "Bakuriani.png"
+      ],
+      kazbegi: [
+        "Kazbegi, Stepantsminda, Gergeti, Georgia.jpg",
+        "Mount Kazbegi.jpg",
+        "Kazbegi, Georgia (7159479283).jpg",
+        "Gergeti kazbegi.jpg"
+      ],
+      gudauri: [
+        "Cross Pass.jpg",
+        "Gudauri, Georgia (16).jpg",
+        "Gudauri.jpg",
+        "Gudauri (14).jpg"
+      ],
+      mestia: [
+        "Near Mestia, Svan towers (35252565354).jpg",
+        "Mestia with Svan towers.jpg",
+        "Mestia towers.jpg",
+        "Svan Tower in Georgia (2017).jpg"
+      ],
+      martvili: [
+        "Martvili Canyon, Georgia. 2018 (9).jpg",
+        "Martvili Canyon.jpg",
+        "Martvili Canyon Waterfalls.jpg",
+        "Martvili Canyon, Georgia. 2018 (6).jpg"
+      ]
+    };
+
     const map = L.map("map", {
       zoomControl: false,
       scrollWheelZoom: true
@@ -902,9 +983,9 @@
 
     L.control.zoom({ position: "bottomright" }).addTo(map);
 
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
       maxZoom: 18,
-      attribution: "&copy; OpenStreetMap"
+      attribution: "&copy; OpenStreetMap &copy; CARTO"
     }).addTo(map);
 
     const markers = new Map();
@@ -913,6 +994,7 @@
     const count = document.getElementById("count");
     const photoModal = document.getElementById("photoModal");
     const modalPhoto = document.getElementById("modalPhoto");
+    const photoGallery = document.getElementById("photoGallery");
     const photoTitle = document.getElementById("photoTitle");
     const photoTags = document.getElementById("photoTags");
     const photoNote = document.getElementById("photoNote");
@@ -926,6 +1008,7 @@
     let activeFilter = "all";
     let activeTypeFilter = "all";
     let selectedPlace = null;
+    let activeGallery = [];
 
     function safeImage(event) {
       event.target.src = fallbackImage;
@@ -944,6 +1027,49 @@
       img.src = src;
     }
 
+    function galleryFor(place) {
+      const files = galleryFiles[place.id] || [];
+      if (!files.length) {
+        return [{ src: place.photo, page: place.photoPage, alt: place.title }];
+      }
+      return files.map((file) => ({
+        src: photo(file),
+        page: photoPage(file),
+        alt: place.title
+      }));
+    }
+
+    function showGalleryImage(index) {
+      const item = activeGallery[index];
+      if (!item) return;
+      setPhoto(modalPhoto, item.src, item.alt);
+      photoCredit.href = item.page;
+      photoGallery.querySelectorAll(".gallery-thumb").forEach((thumb, thumbIndex) => {
+        thumb.classList.toggle("active", thumbIndex === index);
+      });
+    }
+
+    function renderGallery(place) {
+      activeGallery = galleryFor(place);
+      const thumbs = activeGallery.map((item, index) => {
+        const button = document.createElement("button");
+        button.className = `gallery-thumb${index === 0 ? " active" : ""}`;
+        button.type = "button";
+        button.setAttribute("aria-label", `Фото ${index + 1}: ${place.title}`);
+
+        const img = document.createElement("img");
+        img.alt = "";
+        img.referrerPolicy = "no-referrer";
+        setPhoto(img, item.src, "");
+
+        button.appendChild(img);
+        button.addEventListener("click", () => showGalleryImage(index));
+        return button;
+      });
+      photoGallery.replaceChildren(...thumbs);
+      showGalleryImage(0);
+    }
+
     function mapsUrl(place) {
       return `https://www.google.com/maps/search/?api=1&query=${place.coords[0]},${place.coords[1]}`;
     }
@@ -960,10 +1086,9 @@
       photoNote.textContent = place.note;
       photoDistance.textContent = place.distance;
       photoSeason.textContent = place.season;
-      photoCredit.href = place.photoPage;
       mapsLink.href = mapsUrl(place);
       copyStatus.textContent = "";
-      setPhoto(modalPhoto, place.photo, place.title);
+      renderGallery(place);
       photoModal.hidden = false;
       document.body.style.overflow = "hidden";
       if (location.hash !== `#${place.id}`) {
@@ -974,6 +1099,8 @@
     function closePhotoPopup() {
       photoModal.hidden = true;
       modalPhoto.removeAttribute("src");
+      photoGallery.replaceChildren();
+      activeGallery = [];
       copyStatus.textContent = "";
       document.body.style.overflow = "";
     }
@@ -1007,10 +1134,10 @@
     function markerIcon(place) {
       return L.divIcon({
         className: "",
-        html: `<div class="marker-pin ${place.difficulty}"><img src="${place.photo}" alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallbackImage}'"><span></span></div>`,
-        iconSize: [56, 64],
-        iconAnchor: [28, 64],
-        popupAnchor: [0, -58]
+        html: `<div class="marker-pin"><img src="${place.photo}" alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallbackImage}'"></div>`,
+        iconSize: [74, 52],
+        iconAnchor: [37, 26],
+        popupAnchor: [0, -30]
       });
     }
 
